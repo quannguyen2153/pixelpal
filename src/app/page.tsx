@@ -1,9 +1,9 @@
-import DraggableButton from "./components/DraggableButton/DraggableButton";
+import PixelPal from "./components/PixelPal/PixelPal";
 
 export default function Home() {
   return (
     <div>
-      <DraggableButton />
+      <PixelPal />
       <h1>Home</h1>
     </div>
   );
