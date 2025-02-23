@@ -14,7 +14,10 @@ const PixelPal: React.FC = () => {
   };
   const animationDuration = 500;
 
-  const [position, setPosition] = useState({ x: window.innerWidth - buttonSize - 10, y: window.innerHeight - buttonSize - 10 });
+  const [position, setPosition] = useState({
+    x: window.innerWidth - buttonSize - 10,
+    y: window.innerHeight - buttonSize - 10,
+  });
   const [bubbleCurrentSize, setCurrentBubbleSize] = useState({
     width: 0,
     height: 0,
@@ -77,7 +80,10 @@ const PixelPal: React.FC = () => {
       { x: 10, y: 10 }, // Top-left
       { x: window.innerWidth - buttonSize - 10, y: 10 }, // Top-right
       { x: 10, y: window.innerHeight - buttonSize - 10 }, // Bottom-left
-      { x: window.innerWidth - buttonSize - 10, y: window.innerHeight - buttonSize - 10 }, // Bottom-right
+      {
+        x: window.innerWidth - buttonSize - 10,
+        y: window.innerHeight - buttonSize - 10,
+      }, // Bottom-right
     ];
 
     const getDistance = (
@@ -169,10 +175,15 @@ const PixelPal: React.FC = () => {
           />
         )}
         <Button
-          icon={<MessageOutlined />}
           onClick={handleClick}
-          style={{ width: buttonSize, height: buttonSize }}
-        />
+          style={{ width: buttonSize, height: buttonSize, padding: 0 }}
+        >
+          <img
+            src="/pixelpal/joy.png"
+            alt="PixelPal"
+            style={{ width: "100%", height: "100%", pointerEvents: "none" }}
+          />
+        </Button>
       </Flex>
     </Draggable>
   );

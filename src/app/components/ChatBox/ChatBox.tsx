@@ -88,7 +88,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Say something..."
-              style={{ width: "100%", height: 50, resize: "none" }}
+              style={{ height: 50, resize: "none" }}
               disabled={isLoading}
             />
             <Button
@@ -96,7 +96,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({
               size="small"
               icon={<ArrowUpOutlined />}
               onClick={sendMessage}
-              style={{ height: 50 }}
+              style={{ width: 50, height: 50 }}
               disabled={isLoading}
             />
           </Flex>
