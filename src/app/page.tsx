@@ -2,10 +2,11 @@
 
 import { Sour_Gummy } from "next/font/google";
 
-const pageFont = Sour_Gummy({ subsets: ["latin"] });
-
 import dynamic from "next/dynamic";
 import { ConfigProvider } from "antd";
+import { useState } from "react";
+
+import { Message } from "./api/generate/route";
 
 const PixelPal = dynamic(() => import("./components/PixelPal/PixelPal"), {
   ssr: false,
@@ -14,6 +15,8 @@ const HtmlRenderer = dynamic(
   () => import("./components/HtmlRenderer/HtmlRenderer"),
   { ssr: false }
 );
+
+const pageFont = Sour_Gummy({ subsets: ["latin"] });
 
 const introductionPageHtml = `<body style="font-family: Arial, sans-serif; text-align: center; background-color: #fef8ff; padding: 50px;">
     <div style="max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
@@ -26,6 +29,53 @@ const introductionPageHtml = `<body style="font-family: Arial, sans-serif; text-
 </body>`;
 
 export default function Home() {
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [htmlString, setHtmlString] = useState(introductionPageHtml);
+
+  const extractHtmlContent = (content: string): string[] => {
+    const regex = /```html([\s\S]*?)```/g; // Matches content between ```html and ```
+    const matches: string[] = [];
+    let match;
+
+    while ((match = regex.exec(content)) !== null) {
+      matches.push(match[1].trim()); // Extract HTML content and trim whitespace
+    }
+
+    return matches;
+  };
+
+  const onSend = async (message: string) => {
+    const newMessage: Message = { role: "user", content: message };
+    const updatedMessages = [...messages, newMessage];
+    setMessages(updatedMessages);
+
+    try {
+      const response = await fetch("/api/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ messages: updatedMessages }),
+      });
+
+      const data = await response.json();
+      if (data.messages) {
+        setMessages(data.messages);
+      }
+
+      const htmlContent = extractHtmlContent(
+        data.messages[data.messages.length - 1].content
+      ).at(-1);
+
+      console.log(htmlContent);
+      if (htmlContent) {
+        setHtmlString(htmlContent);
+      }
+    } catch (error) {
+      console.error("Error fetching assistant response:", error);
+    }
+  };
+
   return (
     <main className={pageFont.className}>
       <ConfigProvider
@@ -35,8 +85,8 @@ export default function Home() {
           },
         }}
       >
-        <PixelPal />
-        <HtmlRenderer htmlString={introductionPageHtml} />
+        <PixelPal messages={messages} onSend={onSend} />
+        <HtmlRenderer htmlString={htmlString} />
       </ConfigProvider>
     </main>
   );

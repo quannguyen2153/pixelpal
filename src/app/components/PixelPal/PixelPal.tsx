@@ -3,10 +3,16 @@
 import React, { useRef, useState } from "react";
 import Draggable, { DraggableData, DraggableEvent } from "react-draggable";
 import { Flex, Button } from "antd";
-import { MessageOutlined } from "@ant-design/icons";
-import ChatBox, { Message } from "../ChatBox/ChatBox";
 
-const PixelPal: React.FC = () => {
+import { Message } from "@/app/api/generate/route";
+import ChatBox from "../ChatBox/ChatBox";
+
+interface PixelPalProps {
+  messages: Message[];
+  onSend: (message: string) => void;
+}
+
+const PixelPal: React.FC<PixelPalProps> = ({ messages, onSend }) => {
   const buttonSize = 50;
   const chatBubbleSize = {
     width: window.innerWidth / 2 - 2 * buttonSize,
@@ -25,7 +31,6 @@ const PixelPal: React.FC = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([]);
   const nodeRef = useRef<HTMLButtonElement>(null);
 
   const handleDrag = (_: DraggableEvent, data: DraggableData) => {
@@ -138,15 +143,6 @@ const PixelPal: React.FC = () => {
     requestAnimationFrame(animateMove);
   };
 
-  const handleSend = (message: string) => {
-    const newMessage: Message = { id: Date.now(), text: message, role: "user" };
-    setMessages([
-      ...messages,
-      newMessage,
-      { id: Date.now() + 1, text: "AI response", role: "ai" },
-    ]);
-  };
-
   const isLeftSide = position.x < window.innerWidth / 2;
   const isTopSide = position.y < window.innerHeight / 2;
 
@@ -171,7 +167,7 @@ const PixelPal: React.FC = () => {
               height: bubbleCurrentSize.height,
               transition: "opacity 0.3s ease-in-out",
             }}
-            onSend={handleSend}
+            onSend={onSend}
           />
         )}
         <Button
@@ -179,7 +175,7 @@ const PixelPal: React.FC = () => {
           style={{ width: buttonSize, height: buttonSize, padding: 0 }}
         >
           <img
-            src="/pixelpal/joy.png"
+            src="/pixelpal/nerd.png"
             alt="PixelPal"
             style={{ width: "100%", height: "100%", pointerEvents: "none" }}
           />

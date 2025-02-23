@@ -2,13 +2,8 @@ import React, { useState } from "react";
 import { Card, Input, Button, List, Flex, Skeleton } from "antd";
 import { ArrowUpOutlined } from "@ant-design/icons";
 
+import { Message } from "@/app/api/generate/route";
 import styles from "./ChatBox.module.css";
-
-export interface Message {
-  id: number;
-  text: string;
-  role: "user" | "ai";
-}
 
 interface ChatBoxProps {
   title: string;
@@ -67,7 +62,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({
                     whiteSpace: "pre-wrap", // Allows multiline text
                   }}
                 >
-                  {item.text}
+                  {item.content}
                 </div>
               </List.Item>
             )}
