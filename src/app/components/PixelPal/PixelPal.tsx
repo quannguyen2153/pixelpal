@@ -8,22 +8,29 @@ import { Message } from "@/app/api/generate/route";
 import ChatBox from "../ChatBox/ChatBox";
 
 interface PixelPalProps {
+  isLoading: boolean;
   messages: Message[];
   onSend: (message: string) => void;
 }
 
-const PixelPal: React.FC<PixelPalProps> = ({ messages, onSend }) => {
+const PixelPal: React.FC<PixelPalProps> = ({ isLoading, messages, onSend }) => {
   const buttonSize = 50;
+  const corners = [
+    { x: 20, y: 20 }, // Top-left
+    { x: window.innerWidth - buttonSize - 20, y: 20 }, // Top-right
+    { x: 20, y: window.innerHeight - buttonSize - 20 }, // Bottom-left
+    {
+      x: window.innerWidth - buttonSize - 20,
+      y: window.innerHeight - buttonSize - 20,
+    }, // Bottom-right
+  ];
   const chatBubbleSize = {
     width: window.innerWidth / 2 - 2 * buttonSize,
     height: window.innerHeight - 20,
   };
   const animationDuration = 500;
 
-  const [position, setPosition] = useState({
-    x: window.innerWidth - buttonSize - 10,
-    y: window.innerHeight - buttonSize - 10,
-  });
+  const [position, setPosition] = useState(corners[3]);
   const [bubbleCurrentSize, setCurrentBubbleSize] = useState({
     width: 0,
     height: 0,
@@ -80,16 +87,6 @@ const PixelPal: React.FC<PixelPalProps> = ({ messages, onSend }) => {
 
   const handleClick = () => {
     if (isDragging) return; // Prevent triggering when dragging
-
-    const corners = [
-      { x: 10, y: 10 }, // Top-left
-      { x: window.innerWidth - buttonSize - 10, y: 10 }, // Top-right
-      { x: 10, y: window.innerHeight - buttonSize - 10 }, // Bottom-left
-      {
-        x: window.innerWidth - buttonSize - 10,
-        y: window.innerHeight - buttonSize - 10,
-      }, // Bottom-right
-    ];
 
     const getDistance = (
       p1: { x: number; y: number },
@@ -157,7 +154,8 @@ const PixelPal: React.FC<PixelPalProps> = ({ messages, onSend }) => {
         {isOpen && (
           <ChatBox
             title="PixelPal"
-            isLoading={isAnimating}
+            isAnimating={isAnimating}
+            isLoading={isLoading}
             messages={messages}
             style={{
               position: "absolute",

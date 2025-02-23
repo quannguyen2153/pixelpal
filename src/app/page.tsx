@@ -31,6 +31,7 @@ const introductionPageHtml = `<body style="font-family: Arial, sans-serif; text-
 export default function Home() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [htmlString, setHtmlString] = useState(introductionPageHtml);
+  const [isLoading, setIsLoading] = useState(false);
 
   const extractHtmlContent = (content: string): string[] => {
     const regex = /```html([\s\S]*?)```/g; // Matches content between ```html and ```
@@ -48,6 +49,8 @@ export default function Home() {
     const newMessage: Message = { role: "user", content: message };
     const updatedMessages = [...messages, newMessage];
     setMessages(updatedMessages);
+
+    setIsLoading(true);
 
     try {
       const response = await fetch("/api/generate", {
@@ -74,6 +77,8 @@ export default function Home() {
     } catch (error) {
       console.error("Error fetching assistant response:", error);
     }
+
+    setIsLoading(false);
   };
 
   return (
@@ -85,7 +90,7 @@ export default function Home() {
           },
         }}
       >
-        <PixelPal messages={messages} onSend={onSend} />
+        <PixelPal isLoading={isLoading} messages={messages} onSend={onSend} />
         <HtmlRenderer htmlString={htmlString} />
       </ConfigProvider>
     </main>

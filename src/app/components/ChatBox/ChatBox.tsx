@@ -7,6 +7,7 @@ import styles from "./ChatBox.module.css";
 
 interface ChatBoxProps {
   title: string;
+  isAnimating: boolean;
   isLoading: boolean;
   messages: Message[];
   style: React.CSSProperties;
@@ -15,7 +16,8 @@ interface ChatBoxProps {
 
 const ChatBox: React.FC<ChatBoxProps> = ({
   title,
-  isLoading = false,
+  isAnimating,
+  isLoading,
   messages = [],
   style,
   onSend,
@@ -31,7 +33,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({
 
   return (
     <Card title={title} style={style}>
-      {isLoading ? (
+      {isAnimating ? (
         <Skeleton active />
       ) : (
         <>
@@ -39,7 +41,11 @@ const ChatBox: React.FC<ChatBoxProps> = ({
             className={styles.noScrollbar}
             size="small"
             bordered
-            dataSource={messages}
+            dataSource={
+              isLoading
+                ? [...messages, { role: "assistant", content: "" }]
+                : messages
+            }
             renderItem={(item) => (
               <List.Item
                 style={{
@@ -62,7 +68,18 @@ const ChatBox: React.FC<ChatBoxProps> = ({
                     whiteSpace: "pre-wrap", // Allows multiline text
                   }}
                 >
-                  {item.content}
+                  {isLoading && item.content === "" ? (
+                    <Skeleton
+                      active
+                      style={{
+                        width: style.width
+                          ? (parseInt(style.width as string, 10) / 3) * 2
+                          : 300,
+                      }}
+                    />
+                  ) : (
+                    item.content
+                  )}
                 </div>
               </List.Item>
             )}
@@ -84,7 +101,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({
               onChange={(e) => setInput(e.target.value)}
               placeholder="Say something..."
               style={{ height: 50, resize: "none" }}
-              disabled={isLoading}
+              disabled={isAnimating}
             />
             <Button
               type="primary"
@@ -92,7 +109,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({
               icon={<ArrowUpOutlined />}
               onClick={sendMessage}
               style={{ width: 50, height: 50 }}
-              disabled={isLoading}
+              disabled={isAnimating}
             />
           </Flex>
         </>
