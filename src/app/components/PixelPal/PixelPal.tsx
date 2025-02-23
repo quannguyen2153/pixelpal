@@ -7,7 +7,14 @@ import { MessageOutlined } from "@ant-design/icons";
 import ChatBox, { Message } from "../ChatBox/ChatBox";
 
 const PixelPal: React.FC = () => {
-  const [position, setPosition] = useState({ x: 10, y: 10 });
+  const buttonSize = 50;
+  const chatBubbleSize = {
+    width: window.innerWidth / 2 - 2 * buttonSize,
+    height: window.innerHeight - 20,
+  };
+  const animationDuration = 500;
+
+  const [position, setPosition] = useState({ x: window.innerWidth - buttonSize - 10, y: window.innerHeight - buttonSize - 10 });
   const [bubbleCurrentSize, setCurrentBubbleSize] = useState({
     width: 0,
     height: 0,
@@ -17,12 +24,6 @@ const PixelPal: React.FC = () => {
   const [isAnimating, setIsAnimating] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const nodeRef = useRef<HTMLButtonElement>(null);
-  const buttonSize = 50;
-  const chatBubbleSize = {
-    width: window.innerWidth / 2 - 2 * buttonSize,
-    height: window.innerHeight - 20,
-  };
-  const animationDuration = 300;
 
   const handleDrag = (_: DraggableEvent, data: DraggableData) => {
     setIsDragging(true);
@@ -72,14 +73,11 @@ const PixelPal: React.FC = () => {
   const handleClick = () => {
     if (isDragging) return; // Prevent triggering when dragging
 
-    const windowWidth = window.innerWidth;
-    const windowHeight = window.innerHeight;
-
     const corners = [
       { x: 10, y: 10 }, // Top-left
-      { x: windowWidth - buttonSize - 10, y: 10 }, // Top-right
-      { x: 10, y: windowHeight - buttonSize - 10 }, // Bottom-left
-      { x: windowWidth - buttonSize - 10, y: windowHeight - buttonSize - 10 }, // Bottom-right
+      { x: window.innerWidth - buttonSize - 10, y: 10 }, // Top-right
+      { x: 10, y: window.innerHeight - buttonSize - 10 }, // Bottom-left
+      { x: window.innerWidth - buttonSize - 10, y: window.innerHeight - buttonSize - 10 }, // Bottom-right
     ];
 
     const getDistance = (
