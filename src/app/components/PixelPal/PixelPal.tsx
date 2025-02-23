@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useRef, useState } from "react";
-import Draggable from "react-draggable";
-import { Flex, Button, Card } from "antd";
+import Draggable, { DraggableData, DraggableEvent } from "react-draggable";
+import { Flex, Button } from "antd";
 import { MessageOutlined } from "@ant-design/icons";
 import ChatBox, { Message } from "../ChatBox/ChatBox";
 
@@ -14,6 +14,7 @@ const PixelPal: React.FC = () => {
   });
   const [isDragging, setIsDragging] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const nodeRef = useRef<HTMLButtonElement>(null);
   const buttonSize = 50;
@@ -23,9 +24,11 @@ const PixelPal: React.FC = () => {
   };
   const animationDuration = 300;
 
-  const handleDrag = (_: any, data: any) => {
+  const handleDrag = (_: DraggableEvent, data: DraggableData) => {
     setIsDragging(true);
     setPosition({ x: data.x, y: data.y });
+
+    setIsAnimating(true);
 
     let startTime: number | null = null;
     if (isOpen) {
@@ -55,6 +58,7 @@ const PixelPal: React.FC = () => {
           requestAnimationFrame(animateMove);
         } else {
           setIsOpen(false);
+          setIsAnimating(false);
         }
       };
       requestAnimationFrame(animateMove);
@@ -78,8 +82,10 @@ const PixelPal: React.FC = () => {
       { x: windowWidth - buttonSize - 10, y: windowHeight - buttonSize - 10 }, // Bottom-right
     ];
 
-    const getDistance = (p1: any, p2: any) =>
-      Math.hypot(p1.x - p2.x, p1.y - p2.y);
+    const getDistance = (
+      p1: { x: number; y: number },
+      p2: { x: number; y: number }
+    ) => Math.hypot(p1.x - p2.x, p1.y - p2.y);
     const nearestCorner = corners.reduce((prev, curr) =>
       getDistance(position, curr) < getDistance(position, prev) ? curr : prev
     );
@@ -87,6 +93,8 @@ const PixelPal: React.FC = () => {
     if (!isOpen) {
       setIsOpen(true);
     }
+
+    setIsAnimating(true);
 
     let startTime: number | null = null;
 
@@ -120,6 +128,7 @@ const PixelPal: React.FC = () => {
         if (isOpen) {
           setIsOpen(false);
         }
+        setIsAnimating(false);
       }
     };
     requestAnimationFrame(animateMove);
@@ -148,6 +157,7 @@ const PixelPal: React.FC = () => {
         {isOpen && (
           <ChatBox
             title="PixelPal"
+            isLoading={isAnimating}
             messages={messages}
             style={{
               position: "absolute",
