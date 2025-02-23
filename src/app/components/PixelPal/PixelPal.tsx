@@ -4,6 +4,7 @@ import React, { useRef, useState } from "react";
 import Draggable from "react-draggable";
 import { Flex, Button, Card } from "antd";
 import { MessageOutlined } from "@ant-design/icons";
+import ChatBox, { Message } from "../ChatBox/ChatBox";
 
 const PixelPal: React.FC = () => {
   const [position, setPosition] = useState({ x: 10, y: 10 });
@@ -13,9 +14,13 @@ const PixelPal: React.FC = () => {
   });
   const [isDragging, setIsDragging] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [messages, setMessages] = useState<Message[]>([]);
   const nodeRef = useRef<HTMLButtonElement>(null);
   const buttonSize = 50;
-  const chatBubbleSize = { width: 250, height: 150 };
+  const chatBubbleSize = {
+    width: window.innerWidth / 2 - 2 * buttonSize,
+    height: window.innerHeight - 20,
+  };
   const animationDuration = 300;
 
   const handleDrag = (_: any, data: any) => {
@@ -120,6 +125,15 @@ const PixelPal: React.FC = () => {
     requestAnimationFrame(animateMove);
   };
 
+  const handleSend = (message: string) => {
+    const newMessage: Message = { id: Date.now(), text: message, role: "user" };
+    setMessages([
+      ...messages,
+      newMessage,
+      { id: Date.now() + 1, text: "AI response", role: "ai" },
+    ]);
+  };
+
   const isLeftSide = position.x < window.innerWidth / 2;
   const isTopSide = position.y < window.innerHeight / 2;
 
@@ -132,7 +146,9 @@ const PixelPal: React.FC = () => {
     >
       <Flex ref={nodeRef} style={{ position: "fixed", zIndex: 1000 }}>
         {isOpen && (
-          <Card
+          <ChatBox
+            title="PixelPal"
+            messages={messages}
             style={{
               position: "absolute",
               [isTopSide ? "top" : "bottom"]: 0,
@@ -141,9 +157,8 @@ const PixelPal: React.FC = () => {
               height: bubbleCurrentSize.height,
               transition: "opacity 0.3s ease-in-out",
             }}
-          >
-            <p>Chat content goes here...</p>
-          </Card>
+            onSend={handleSend}
+          />
         )}
         <Button
           icon={<MessageOutlined />}
