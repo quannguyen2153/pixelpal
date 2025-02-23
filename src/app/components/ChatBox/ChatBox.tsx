@@ -41,29 +41,40 @@ const ChatBox: React.FC<ChatBoxProps> = ({
       ) : (
         <>
           <List
+            className={styles.noScrollbar}
             size="small"
             bordered
             dataSource={messages}
             renderItem={(item) => (
               <List.Item
                 style={{
-                  textAlign: item.role === "user" ? "right" : "left",
-                  backgroundColor: item.role === "user" ? "#1890ff" : "#f0f0f0",
-                  color: item.role === "user" ? "#fff" : "#000",
-                  padding: "5px 10px",
-                  borderRadius: "5px",
-                  margin: "5px 0",
-                  alignSelf: item.role === "user" ? "flex-end" : "flex-start",
-                  maxWidth: "80%",
+                  display: "flex",
+                  justifyContent:
+                    item.role === "user" ? "flex-end" : "flex-start",
                 }}
               >
-                {item.text}
+                <div
+                  style={{
+                    textAlign: "left",
+                    backgroundColor:
+                      item.role === "user" ? "#1890ff" : "#f0f0f0",
+                    color: item.role === "user" ? "#fff" : "#000",
+                    padding: "5px 10px",
+                    borderRadius: "5px",
+                    margin: "5px 0",
+                    maxWidth: "80%",
+                    wordWrap: "break-word",
+                    whiteSpace: "pre-wrap", // Allows multiline text
+                  }}
+                >
+                  {item.text}
+                </div>
               </List.Item>
             )}
             style={{
-              maxHeight: style.height
-                ? parseInt(style.height as string, 10) - 100
-                : 300,
+              height: style.height
+                ? parseInt(style.height as string, 10) - 175
+                : 500,
               overflowY: "auto",
               marginBottom: 10,
               display: "flex",
