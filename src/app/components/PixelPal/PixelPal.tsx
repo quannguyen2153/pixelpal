@@ -21,23 +21,56 @@ const PixelPal: React.FC = () => {
   const handleDrag = (_: any, data: any) => {
     setIsDragging(true);
     setPosition({ x: data.x, y: data.y });
+
+    let startTime: number | null = null;
+    if (isOpen) {
+      const animateMove = (timestamp: number) => {
+        if (!startTime) startTime = timestamp;
+        const progress = Math.min(
+          (timestamp - startTime) / animationDuration,
+          1
+        );
+
+        setCurrentBubbleSize((prevSize) => ({
+          width:
+            prevSize.width +
+            (isOpen
+              ? 0 - prevSize.width
+              : chatBubbleSize.width - prevSize.width) *
+              progress,
+          height:
+            prevSize.height +
+            (isOpen
+              ? 0 - prevSize.height
+              : chatBubbleSize.height - prevSize.height) *
+              progress,
+        }));
+
+        if (progress < 1) {
+          requestAnimationFrame(animateMove);
+        } else {
+          setIsOpen(false);
+        }
+      };
+      requestAnimationFrame(animateMove);
+    }
   };
 
   const handleStop = () => {
-    setTimeout(() => setIsDragging(false), 100);
+    setTimeout(() => setIsDragging(false), 100); // Small delay to prevent immediate click triggering
   };
 
   const handleClick = () => {
-    if (isDragging) return;
+    if (isDragging) return; // Prevent triggering when dragging
 
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
 
     const corners = [
-      { x: 10, y: 10 },
-      { x: windowWidth - buttonSize - 10, y: 10 },
-      { x: 10, y: windowHeight - buttonSize - 10 },
-      { x: windowWidth - buttonSize - 10, y: windowHeight - buttonSize - 10 },
+      { x: 10, y: 10 }, // Top-left
+      { x: windowWidth - buttonSize - 10, y: 10 }, // Top-right
+      { x: 10, y: windowHeight - buttonSize - 10 }, // Bottom-left
+      { x: windowWidth - buttonSize - 10, y: windowHeight - buttonSize - 10 }, // Bottom-right
     ];
 
     const getDistance = (p1: any, p2: any) =>
@@ -64,10 +97,16 @@ const PixelPal: React.FC = () => {
       setCurrentBubbleSize((prevSize) => ({
         width:
           prevSize.width +
-          (isOpen ? 0 - prevSize.width : chatBubbleSize.width - prevSize.width) * progress,
+          (isOpen
+            ? 0 - prevSize.width
+            : chatBubbleSize.width - prevSize.width) *
+            progress,
         height:
           prevSize.height +
-          (isOpen ? 0 - prevSize.height : chatBubbleSize.height - prevSize.height) * progress,
+          (isOpen
+            ? 0 - prevSize.height
+            : chatBubbleSize.height - prevSize.height) *
+            progress,
       }));
 
       if (progress < 1) {
@@ -96,8 +135,8 @@ const PixelPal: React.FC = () => {
           <Card
             style={{
               position: "absolute",
-              [isLeftSide ? "left" : "right"]: buttonSize + 10,
               [isTopSide ? "top" : "bottom"]: 0,
+              [isLeftSide ? "left" : "right"]: buttonSize + 10,
               width: bubbleCurrentSize.width,
               height: bubbleCurrentSize.height,
               transition: "opacity 0.3s ease-in-out",
